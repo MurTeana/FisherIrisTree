@@ -1,32 +1,22 @@
-import numpy as np
-import pandas as pd 
-import matplotlib.pyplot as plt
-import seaborn as sns
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import export_graphviz
 
-datafile=pd.read_csv("C:/Users/St.Eva/Desktop/Projects Python/FisherIrisTree/IrisFisher.csv")
-print (datafile.head())
+df = pd.read_csv("C:/Users/St.Eva/Desktop/Projects Python/FisherIrisTree/IrisFisher.csv")
 
-x=datafile.iloc[:,:1]
-y=datafile.iloc[:,1:]
+df.head()
 
-#print (x.head())
-#print (y.head())
+df.drop('Id',axis=1,inplace=True)
+df_X = df[['SepalLengthCm','SepalWidthCm','PetalLengthCm','PetalWidthCm']]
+df_y = df.Species
 
-#построим модель с помощью sklearn
-from sklearn import tree
-model=tree.DecisionTreeClassifier(criterion="entropy")
-print(model.fit(x,y))
-#оценка модели
-print(model.score(x,y))
-print('Правильность на обучающем наборе:{:.3f}'.format(model.score(x,y)))
-print('Важность признаков: \n{}'.format(model.feature_importances_))
-#прогнозирование с помощью модели
-print('С данной длиной ирис будет отнесен к классу ')
-print(model.predict([[12]]))
-print('С данной длиной ирис будет отнесен к классу ')
-print(model.predict([[29]]))
-print('С данной длиной ирис будет отнесен к классу ')
-print(model.predict([[49]]))
-#
-#визуализация модели
-#print(tree.plot_tree(model))
+df_X_train, df_X_test, df_y_train, df_y_test = train_test_split(df_X, df_y,test_size=0.2)
+
+tree = DecisionTreeClassifier(max_depth=4)
+
+tree.fit(df_X_train, df_y_train)
+
+tree.score(df_X_test, df_y_test)
+
+export_graphviz(tree, out_file='C:/Users/St.Eva/Desktop/Projects Python/FisherIrisTree/pics/tree_iris.dot', feature_names=df_X.columns, filled=True)
